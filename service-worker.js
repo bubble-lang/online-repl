@@ -2,8 +2,8 @@ const CACHE_NAME = 'bubble-repl-cache';
 const urlsToCache = [
   '/',
   '/index.html',
-  'https://raw.githubusercontent.com/bubble-lang/online-repl/main/main.wasm',
-  'https://raw.githubusercontent.com/bubble-lang/online-repl/main/wasm_exec.js',
+  'https://cdn.jsdelivr.net/gh/bubble-lang/online-repl@main/main.wasm',
+  'https://cdn.jsdelivr.net/gh/bubble-lang/online-repl@main/wasm_exec.js',
   // Add more files to cache as needed
 ];
 
