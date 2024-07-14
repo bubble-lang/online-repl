@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bubble REPL</title>
+    <style>
+        #terminal {
+            width: 600px;
+            height: 400px;
+            background-color: black;
+            color: white;
+            font-family: monospace;
+            padding: 10px;
+            overflow-y: scroll;
+        }
+        #input {
+            width: 590px;
+            background-color: black;
+            color: white;
+            font-family: monospace;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+    <input type="text" id="input" autocomplete="off" autofocus>
+
+    <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    let bubbleREPL;
+
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+        go.run(result.instance);
+        bubbleREPL = globalThis.bubbleREPL;
+        document.getElementById("input").focus();
+    });
+
+    const terminal = document.getElementById("terminal");
+    const input = document.getElementById("input");
+
+    function appendToTerminal(text) {
+        terminal.innerHTML += text + "<br>";
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function evaluateBubbleCode(code) {
+        if (bubbleREPL) {
+            try {
+                const result = bubbleREPL.evaluateBubble(code);
+                if (result !== undefined) {
+                    appendToTerminal(" " + result);
+                }
+            } catch (error) {
+                appendToTerminal("Error: " + error.message);
+            }
+        } else {
+            appendToTerminal("REPL not loaded yet. Please wait...");
+        }
+    }
+
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            const code = input.value.trim();
+            appendToTerminal("> " + code);
+            input.value = "";
+
+            if (code === "exit") {
+                appendToTerminal("Exiting the Bubble REPL.");
+            } else if (code === "help") {
+                appendToTerminal("Bubble commands:");
+                appendToTerminal("  exit - Exit the Bubble REPL");
+                appendToTerminal("  help - Display this help message");
+                appendToTerminal("  <expression> - Evaluate the expression");
+                appendToTerminal("  remember <variable> as <expression> - Assign a value to a variable");
+                appendToTerminal("  say <expression> - Print the value of an expression");
+            } else {
+                evaluateBubbleCode(code);
+            }
+
+            appendToTerminal("");
+        }
+    });
+</script>
+</body>
+</html>
